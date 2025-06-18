@@ -1,7 +1,11 @@
 openapi: 3.0.0
 info:
-  title: Sample API for Chaos Testing
+  title: Sample Inventory API
   version: 1.0.0
+  description: |
+    A simple service for managing inventory items. The API supports creating,
+    listing, updating and deleting items and is useful for testing typical
+    business workflows.
 paths:
   /ping:
     get:
@@ -112,6 +116,7 @@ components:
   schemas:
     Item:
       type: object
+      description: An inventory record identified by an integer ID and a name.
       properties:
         id:
           type: integer
@@ -121,6 +126,7 @@ components:
           example: example item
     ItemInput:
       type: object
+      description: Payload used when creating or updating an inventory item.
       required:
         - name
       properties:
