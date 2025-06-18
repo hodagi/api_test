@@ -38,6 +38,12 @@ Run the image and expose port 5000:
 docker run -p 5000:5000 inventory-api
 ```
 
+Example search request:
+
+```bash
+curl http://localhost:5000/items?q=foo
+```
+
 ## API specification
 
 See [`api_spec.yaml`](api_spec.yaml) for the OpenAPI 3.0 specification of the available endpoints.
