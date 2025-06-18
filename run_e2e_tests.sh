@@ -15,20 +15,24 @@ check_status() {
 curl -fsS "$BASE_URL/ping" | grep -q 'pong'
 
 # Create item
-ITEM_ID=$(curl -fsS -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":"test"}' | jq '.id')
+ITEM_ID=$(curl -fsS -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":"test","quantity":5}' | jq '.id')
 
 # Invalid creates
-check_status 400 -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":""}'
-check_status 400 -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":123}'
+check_status 400 -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":"","quantity":1}'
+check_status 400 -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":123,"quantity":1}'
+check_status 400 -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":"bad","quantity":"foo"}'
+check_status 400 -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":"bad","quantity":-1}'
 
 # Get item
-curl -fsS "$BASE_URL/items/${ITEM_ID}" | jq -e '.name == "test"' >/dev/null
+curl -fsS "$BASE_URL/items/${ITEM_ID}" | jq -e '.name == "test" and .quantity == 5' >/dev/null
 check_status 404 "$BASE_URL/items/9999"
 
 # Update item
-curl -fsS -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"updated"}' | jq -e '.name == "updated"' >/dev/null
-check_status 400 -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":""}'
-check_status 404 -X PUT "$BASE_URL/items/9999" -H 'Content-Type: application/json' -d '{"name":"foo"}'
+curl -fsS -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"updated","quantity":8}' | jq -e '.name == "updated" and .quantity == 8' >/dev/null
+check_status 400 -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"","quantity":1}'
+check_status 400 -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"updated","quantity":"foo"}'
+check_status 400 -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"updated","quantity":-5}'
+check_status 404 -X PUT "$BASE_URL/items/9999" -H 'Content-Type: application/json' -d '{"name":"foo","quantity":1}'
 
 # Delete item
 curl -fsS -X DELETE "$BASE_URL/items/${ITEM_ID}" | jq -e ".id == ${ITEM_ID}" >/dev/null
