@@ -17,6 +17,10 @@ curl -fsS "$BASE_URL/ping" | grep -q 'pong'
 # Create item
 ITEM_ID=$(curl -fsS -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":"test","quantity":5}' | jq '.id')
 
+# Search should find the new item
+curl -fsS "$BASE_URL/items?q=es" | jq -e "length == 1 and .[0].id == ${ITEM_ID}" >/dev/null
+curl -fsS "$BASE_URL/items?q=zzz" | jq -e 'length == 0' >/dev/null
+
 # Invalid creates
 check_status 400 -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":"","quantity":1}'
 check_status 400 -X POST "$BASE_URL/items" -H 'Content-Type: application/json' -d '{"name":123,"quantity":1}'
@@ -29,6 +33,7 @@ check_status 404 "$BASE_URL/items/9999"
 
 # Update item
 curl -fsS -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"updated","quantity":8}' | jq -e '.name == "updated" and .quantity == 8' >/dev/null
+curl -fsS "$BASE_URL/items?q=UPD" | jq -e "length == 1 and .[0].name == \"updated\"" >/dev/null
 check_status 400 -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"","quantity":1}'
 check_status 400 -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"updated","quantity":"foo"}'
 check_status 400 -X PUT "$BASE_URL/items/${ITEM_ID}" -H 'Content-Type: application/json' -d '{"name":"updated","quantity":-5}'

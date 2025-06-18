@@ -24,6 +24,12 @@ python server.py
 
 The server listens on `http://localhost:5000` by default.
 
+Example search request:
+
+```bash
+curl http://localhost:5000/items?q=foo
+```
+
 ## API specification
 
 See [`api_spec.yaml`](api_spec.yaml) for the OpenAPI 3.0 specification of the available endpoints.
