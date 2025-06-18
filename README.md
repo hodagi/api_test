@@ -6,6 +6,9 @@ The endpoint functions live in [`controllers.py`](controllers.py) and are refere
 
 Each item consists of an integer `id`, a `name`, an integer `quantity` and a numeric `price` value.
 
+The server also exposes a simple health check at `GET /ping` which returns
+`{"message": "pong"}`.
+
 ## Requirements
 
 * Python 3.11+
@@ -24,7 +27,8 @@ pip install -r requirements.txt
 python server.py
 ```
 
-The server listens on `http://localhost:5000` by default.
+Set the `PORT` environment variable to change the listen port (default `5000`).
+The E2E script respects this value when computing its default `BASE_URL`.
 
 ## Docker
 
@@ -56,10 +60,20 @@ curl http://localhost:5000/items/low-stock?threshold=5
 
 See [`api_spec.yaml`](api_spec.yaml) for the OpenAPI 3.0 specification of the available endpoints.
 
+## Unit tests
+
+Run the automated unit tests using [pytest](https://docs.pytest.org/en/stable/):
+
+```bash
+pytest -q
+```
+
 ## End‑to‑end tests
 
-Run the provided script after starting the server. The suite now exercises
-common error scenarios such as invalid input and unknown IDs:
+Run the provided script after starting the server. The suite exercises common
+error scenarios such as invalid input and unknown IDs. The script assumes the
+server is reachable at `http://localhost:${PORT}` but you can override this by
+setting the `BASE_URL` environment variable:
 
 ```bash
 ./run_e2e_tests.sh
