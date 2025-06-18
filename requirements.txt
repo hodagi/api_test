@@ -1,1 +1,3 @@
 Flask==3.0.3
+
+connexion[flask]>=3.0.0

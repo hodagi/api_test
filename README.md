@@ -2,6 +2,8 @@
 
 This repository provides a simple REST API written in Python using Flask. The API can be used for experimenting with chaos engineering techniques and for running end‑to‑end regression tests using `curl`.
 
+The endpoint functions live in [`controllers.py`](controllers.py) and are referenced from `api_spec.yaml` via `operationId` definitions. The server uses [Connexion](https://connexion.readthedocs.io/) to load the OpenAPI specification and dispatch requests to these controller functions.
+
 ## Requirements
 
 * Python 3.11+

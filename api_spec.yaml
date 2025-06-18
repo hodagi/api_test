@@ -6,6 +6,7 @@ paths:
   /ping:
     get:
       summary: Health check
+      operationId: controllers.ping
       responses:
         '200':
           description: Returns pong message
@@ -20,6 +21,7 @@ paths:
   /items:
     get:
       summary: List all items
+      operationId: controllers.list_items
       responses:
         '200':
           description: List of items
@@ -31,6 +33,7 @@ paths:
                   $ref: '#/components/schemas/Item'
     post:
       summary: Create a new item
+      operationId: controllers.create_item
       requestBody:
         required: true
         content:
@@ -47,6 +50,7 @@ paths:
   /items/{id}:
     get:
       summary: Get item by ID
+      operationId: controllers.get_item
       parameters:
         - in: path
           name: id
@@ -64,6 +68,7 @@ paths:
           description: Not found
     put:
       summary: Update item
+      operationId: controllers.update_item
       parameters:
         - in: path
           name: id
@@ -87,6 +92,7 @@ paths:
           description: Not found
     delete:
       summary: Delete item
+      operationId: controllers.delete_item
       parameters:
         - in: path
           name: id
