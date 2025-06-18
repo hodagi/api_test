@@ -7,7 +7,12 @@ def ping():
     return jsonify({'message': 'pong'})
 
 def list_items():
-    return jsonify(list(items.values()))
+    q = request.args.get('q')
+    results = list(items.values())
+    if q:
+        q_lower = q.lower()
+        results = [item for item in results if q_lower in item['name'].lower()]
+    return jsonify(results)
 
 def create_item():
     """Create a new item with a non-empty string name and integer quantity."""

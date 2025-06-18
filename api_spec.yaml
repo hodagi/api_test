@@ -26,6 +26,12 @@ paths:
     get:
       summary: List all items
       operationId: controllers.list_items
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Filter results by case-insensitive substring match on the item name. Returns all items when omitted.
       responses:
         '200':
           description: List of items
