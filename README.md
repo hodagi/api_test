@@ -1,8 +1,8 @@
-# Sample API Server for Chaos Testing
+# Sample Inventory API Server
 
-This repository provides a simple REST API written in Python using Flask. The API can be used for experimenting with chaos engineering techniques and for running end‑to‑end regression tests using `curl`.
+This repository provides a simple REST API written in Python using Flask. The API simulates a lightweight inventory service so you can experiment with typical CRUD operations and run end‑to‑end regression tests using `curl`.
 
-The endpoint functions live in [`controllers.py`](controllers.py) and are referenced from `api_spec.yaml` via `operationId` definitions. The server uses [Connexion](https://connexion.readthedocs.io/) to load the OpenAPI specification and dispatch requests to these controller functions.
+The endpoint functions live in [`controllers.py`](controllers.py) and are referenced from `api_spec.yaml` via `operationId` definitions. The server uses [Connexion](https://connexion.readthedocs.io/) to load the OpenAPI specification and dispatch requests to these controller functions. Together they expose operations for creating, listing, updating and deleting inventory items.
 
 ## Requirements
 
