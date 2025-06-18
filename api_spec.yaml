@@ -116,7 +116,7 @@ components:
   schemas:
     Item:
       type: object
-      description: An inventory record identified by an integer ID and a name.
+      description: An inventory record identified by an integer ID, a name and a quantity.
       properties:
         id:
           type: integer
@@ -124,12 +124,19 @@ components:
         name:
           type: string
           example: example item
+        quantity:
+          type: integer
+          example: 10
     ItemInput:
       type: object
       description: Payload used when creating or updating an inventory item.
       required:
         - name
+        - quantity
       properties:
         name:
           type: string
           example: example item
+        quantity:
+          type: integer
+          example: 10

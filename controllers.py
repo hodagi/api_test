@@ -10,13 +10,16 @@ def list_items():
     return jsonify(list(items.values()))
 
 def create_item():
-    """Create a new item with a non-empty string name."""
+    """Create a new item with a non-empty string name and integer quantity."""
     global next_id
     data = request.get_json(force=True)
     name = data.get('name') if isinstance(data, dict) else None
+    quantity = data.get('quantity') if isinstance(data, dict) else None
     if not isinstance(name, str) or not name.strip():
         abort(400)
-    item = {'id': next_id, 'name': name}
+    if not isinstance(quantity, int) or quantity < 0:
+        abort(400)
+    item = {'id': next_id, 'name': name, 'quantity': quantity}
     items[next_id] = item
     next_id += 1
     return jsonify(item), 201
@@ -27,14 +30,18 @@ def get_item(id):
     return jsonify(items[id])
 
 def update_item(id):
-    """Update an existing item's name."""
+    """Update an existing item's name and quantity."""
     if id not in items:
         abort(404)
     data = request.get_json(force=True)
     name = data.get('name') if isinstance(data, dict) else None
+    quantity = data.get('quantity') if isinstance(data, dict) else None
     if not isinstance(name, str) or not name.strip():
         abort(400)
+    if not isinstance(quantity, int) or quantity < 0:
+        abort(400)
     items[id]['name'] = name
+    items[id]['quantity'] = quantity
     return jsonify(items[id])
 
 def delete_item(id):
