@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
-BASE_URL=${BASE_URL:-http://localhost:5000}
+PORT=${PORT:-5000}
+BASE_URL=${BASE_URL:-http://localhost:${PORT}}
 
 check_status() {
   expected=$1; shift
