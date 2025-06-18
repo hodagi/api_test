@@ -1,7 +1,10 @@
 import connexion
 
-app = connexion.App(__name__, specification_dir='.')
-app.add_api('api_spec.yaml')
+from database import init_db
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+app = connexion.App(__name__, specification_dir=".")
+app.add_api("api_spec.yaml")
+
+if __name__ == "__main__":
+    init_db()
+    app.run(host="0.0.0.0", port=5000)

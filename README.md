@@ -23,6 +23,12 @@ python server.py
 ```
 
 The server listens on `http://localhost:5000` by default.
+By default data is stored in `inventory.db` in the current directory. You can
+specify a different location using the `DB_PATH` environment variable:
+
+```bash
+DB_PATH=/tmp/mydb.sqlite python server.py
+```
 
 ## API specification
 
