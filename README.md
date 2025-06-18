@@ -24,6 +24,20 @@ python server.py
 
 The server listens on `http://localhost:5000` by default.
 
+## Docker
+
+Build the container image:
+
+```bash
+docker build -t inventory-api .
+```
+
+Run the image and expose port 5000:
+
+```bash
+docker run -p 5000:5000 inventory-api
+```
+
 ## API specification
 
 See [`api_spec.yaml`](api_spec.yaml) for the OpenAPI 3.0 specification of the available endpoints.
