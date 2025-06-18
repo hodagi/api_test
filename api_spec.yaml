@@ -57,6 +57,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Item'
+  /items/low-stock:
+    get:
+      summary: List items below a quantity threshold
+      operationId: controllers.low_stock
+      parameters:
+        - in: query
+          name: threshold
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Items with quantity below threshold
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
   /items/{id}:
     get:
       summary: Get item by ID
@@ -122,7 +141,7 @@ components:
   schemas:
     Item:
       type: object
-      description: An inventory record identified by an integer ID, a name and a quantity.
+      description: An inventory record identified by an integer ID, a name, a quantity and a price.
       properties:
         id:
           type: integer
@@ -133,12 +152,16 @@ components:
         quantity:
           type: integer
           example: 10
+        price:
+          type: number
+          example: 9.99
     ItemInput:
       type: object
       description: Payload used when creating or updating an inventory item.
       required:
         - name
         - quantity
+        - price
       properties:
         name:
           type: string
@@ -146,3 +169,6 @@ components:
         quantity:
           type: integer
           example: 10
+        price:
+          type: number
+          example: 9.99

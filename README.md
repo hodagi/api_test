@@ -4,6 +4,8 @@ This repository provides a simple REST API written in Python using Flask. The AP
 
 The endpoint functions live in [`controllers.py`](controllers.py) and are referenced from `api_spec.yaml` via `operationId` definitions. The server uses [Connexion](https://connexion.readthedocs.io/) to load the OpenAPI specification and dispatch requests to these controller functions. Together they expose operations for creating, listing, updating and deleting inventory items.
 
+Each item consists of an integer `id`, a `name`, an integer `quantity` and a numeric `price` value.
+
 ## Requirements
 
 * Python 3.11+
@@ -42,6 +44,12 @@ Example search request:
 
 ```bash
 curl http://localhost:5000/items?q=foo
+```
+
+The `/items/low-stock` endpoint lists items whose quantity is below a provided threshold:
+
+```bash
+curl http://localhost:5000/items/low-stock?threshold=5
 ```
 
 ## API specification
