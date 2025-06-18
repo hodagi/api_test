@@ -30,7 +30,8 @@ See [`api_spec.yaml`](api_spec.yaml) for the OpenAPI 3.0 specification of the av
 
 ## End‑to‑end tests
 
-Run the provided script after starting the server:
+Run the provided script after starting the server. The suite now exercises
+common error scenarios such as invalid input and unknown IDs:
 
 ```bash
 ./run_e2e_tests.sh
