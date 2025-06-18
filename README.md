@@ -37,3 +37,18 @@ Run the provided script after starting the server:
 ```
 
 The script uses `curl` to perform a sequence of API calls and fails on the first error.
+
+## Regenerating controller stubs
+
+Controller skeletons can be derived from the OpenAPI specification using [OpenAPI Generator](https://openapi-generator.tech/). The `python-flask` generator emits Flask + Connexion code that matches the operations defined in `api_spec.yaml`.
+
+Run the generator with `npx`:
+
+```bash
+npx --yes @openapitools/openapi-generator-cli generate \
+  -i api_spec.yaml \
+  -g python-flask \
+  -o gen
+```
+
+This creates stubs in `gen/openapi_server/controllers/`. Copy any new functions into `controllers.py` and then remove the temporary `gen/` directory.
