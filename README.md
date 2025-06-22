@@ -28,33 +28,50 @@ python server.py
 ```
 
 Set the `PORT` environment variable to change the listen port (default `5000`).
-The E2E script respects this value when computing its default `BASE_URL`.
 
-## Docker
+## Running with Docker
 
-Build the container image:
+Build and run the Docker image:
 
 ```bash
+# Build the image (rebuild after code changes)
 docker build -t inventory-api .
-```
 
-Run the image and expose port 5000:
-
-```bash
+# Run the container
 docker run -p 5000:5000 inventory-api
 ```
 
-Example search request:
+**Note**: Always rebuild the Docker image after making code changes to ensure the container runs the latest version.
+
+## API Usage Examples
+
+List all items (returns paginated response):
 
 ```bash
-curl http://localhost:5000/items?q=foo
+curl http://localhost:5000/items
+# Response: {"items": [...], "page": 1, "per_page": 10, "total": n, "pages": n, "has_next": bool, "has_prev": bool}
 ```
 
-The `/items/low-stock` endpoint lists items whose quantity is below a provided threshold:
+Search items with pagination:
 
 ```bash
-curl http://localhost:5000/items/low-stock?threshold=5
+curl http://localhost:5000/items?q=foo&page=2&per_page=5
 ```
+
+The `/items/low-stock` endpoint lists items whose quantity is below a provided threshold (also paginated):
+
+```bash
+curl http://localhost:5000/items/low-stock?threshold=5&page=1&per_page=20
+```
+
+**Pagination Note**: The `/items` and `/items/low-stock` endpoints now return paginated responses with the following structure:
+- `items`: Array of items for the current page
+- `page`: Current page number (1-based)
+- `per_page`: Number of items per page (max 100)
+- `total`: Total number of items
+- `pages`: Total number of pages
+- `has_next`: Boolean indicating if there's a next page
+- `has_prev`: Boolean indicating if there's a previous page
 
 ## API specification
 

@@ -1,18 +1,48 @@
 from flask import jsonify, request, abort
+import math
 
 items = {}
 next_id = 1
+
+def paginate_results(results, page=1, per_page=10):
+    """Paginate a list of results."""
+    total = len(results)
+    pages = math.ceil(total / per_page) if total > 0 else 1
+    
+    # Ensure page is within valid range
+    page = max(1, min(page, pages))
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    
+    return {
+        'items': results[start:end],
+        'page': page,
+        'per_page': per_page,
+        'total': total,
+        'pages': pages,
+        'has_next': page < pages,
+        'has_prev': page > 1
+    }
 
 def ping():
     return jsonify({'message': 'pong'})
 
 def list_items():
     q = request.args.get('q')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    # Validate pagination parameters
+    page = max(1, page)
+    per_page = max(1, min(per_page, 100))  # Limit to 100 items per page
+    
     results = list(items.values())
     if q:
         q_lower = q.lower()
         results = [item for item in results if q_lower in item['name'].lower()]
-    return jsonify(results)
+    
+    return jsonify(paginate_results(results, page, per_page))
 
 def create_item():
     """Create a new item with a non-empty string name, integer quantity and numeric price."""
@@ -65,7 +95,15 @@ def delete_item(id):
 def low_stock():
     """List items with quantity below the given threshold."""
     threshold = request.args.get('threshold', type=int)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
     if threshold is None or threshold < 0:
         abort(400)
+    
+    # Validate pagination parameters
+    page = max(1, page)
+    per_page = max(1, min(per_page, 100))  # Limit to 100 items per page
+    
     results = [item for item in items.values() if item['quantity'] < threshold]
-    return jsonify(results)
+    return jsonify(paginate_results(results, page, per_page))

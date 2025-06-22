@@ -49,19 +49,38 @@ def test_list_items_and_search(client):
     client.post('/items', json={'name':'banana','quantity':2,'price':0.5})
     resp = client.get('/items')
     assert resp.status_code == 200
-    assert len(resp.json()) == 2
+    data = resp.json()
+    assert 'items' in data
+    assert len(data['items']) == 2
+    assert data['total'] == 2
+    assert data['page'] == 1
+    assert data['per_page'] == 10
+    assert data['pages'] == 1
+    assert data['has_next'] == False
+    assert data['has_prev'] == False
+    
     resp = client.get('/items?q=app')
-    assert len(resp.json()) == 1
+    data = resp.json()
+    assert len(data['items']) == 1
+    assert data['total'] == 1
+    
     resp = client.get('/items?q=zzz')
-    assert len(resp.json()) == 0
+    data = resp.json()
+    assert len(data['items']) == 0
+    assert data['total'] == 0
 
 def test_low_stock(client):
     client.post('/items', json={'name':'apple','quantity':5,'price':1})
     client.post('/items', json={'name':'banana','quantity':2,'price':1})
     resp = client.get('/items/low-stock?threshold=3')
     assert resp.status_code == 200
-    ids = [item['id'] for item in resp.json()]
+    data = resp.json()
+    assert 'items' in data
+    ids = [item['id'] for item in data['items']]
     assert ids == [2]
+    assert data['total'] == 1
+    assert data['page'] == 1
+    
     resp = client.get('/items/low-stock?threshold=-1')
     assert resp.status_code == 400
 
@@ -86,3 +105,76 @@ def test_delete_item(client):
     assert resp.status_code == 404
     resp = client.delete('/items/1')
     assert resp.status_code == 404
+
+def test_pagination(client):
+    # Create 15 items
+    for i in range(15):
+        client.post('/items', json={'name':f'item{i}','quantity':i,'price':i*0.5})
+    
+    # Test default pagination
+    resp = client.get('/items')
+    data = resp.json()
+    assert len(data['items']) == 10
+    assert data['total'] == 15
+    assert data['page'] == 1
+    assert data['per_page'] == 10
+    assert data['pages'] == 2
+    assert data['has_next'] == True
+    assert data['has_prev'] == False
+    
+    # Test page 2
+    resp = client.get('/items?page=2')
+    data = resp.json()
+    assert len(data['items']) == 5
+    assert data['page'] == 2
+    assert data['has_next'] == False
+    assert data['has_prev'] == True
+    
+    # Test custom per_page
+    resp = client.get('/items?per_page=5')
+    data = resp.json()
+    assert len(data['items']) == 5
+    assert data['pages'] == 3
+    
+    # Test per_page limit
+    resp = client.get('/items?per_page=200')
+    data = resp.json()
+    assert data['per_page'] == 100  # Should be capped at 100
+    
+    # Test invalid page (should clamp to valid range)
+    resp = client.get('/items?page=100')
+    data = resp.json()
+    assert data['page'] == 2  # Should be clamped to last page
+    
+    # Test page 0 (should default to 1)
+    resp = client.get('/items?page=0')
+    data = resp.json()
+    assert data['page'] == 1
+
+def test_pagination_with_search(client):
+    # Create items
+    for i in range(10):
+        client.post('/items', json={'name':f'apple{i}','quantity':i,'price':i*0.5})
+    for i in range(5):
+        client.post('/items', json={'name':f'banana{i}','quantity':i,'price':i*0.5})
+    
+    # Search with pagination
+    resp = client.get('/items?q=apple&per_page=3')
+    data = resp.json()
+    assert len(data['items']) == 3
+    assert data['total'] == 10
+    assert data['pages'] == 4
+    assert all('apple' in item['name'] for item in data['items'])
+
+def test_pagination_low_stock(client):
+    # Create items with varying quantities
+    for i in range(15):
+        client.post('/items', json={'name':f'item{i}','quantity':i % 5,'price':i*0.5})
+    
+    # Test low stock with pagination
+    resp = client.get('/items/low-stock?threshold=3&per_page=5')
+    data = resp.json()
+    assert len(data['items']) == 5
+    assert all(item['quantity'] < 3 for item in data['items'])
+    assert data['total'] == 9  # items with quantity 0, 1, 2
+    assert data['pages'] == 2
